@@ -103,6 +103,36 @@
   loadingBar.style.display = "block";
   var unityInstance;
 
+  // Function to send a message to Unity
+  function sendTextToUnity() {
+    if (unityInstance) {
+      unityInstance.SendMessage('TextObject', 'SetText', 'javatest');
+    } else {
+      console.error('Unity instance is not available.');
+    }
+  }
+
+  var xpos = 0;
+
+  function setCameraPosition() {
+    if (unityInstance) {
+      xpos += 0.5; // Increment the x position by 0.5
+      unityInstance.SendMessage('Main Camera', 'SetCameraXPosition', xpos.toString()); // Send the updated position to Unity
+    } else {
+      console.error('Unity instance is not available.');
+    }
+  }
+
+  var xrot = 0;
+  function setCameraRotation() {
+    if (unityInstance) {
+      xrot += 0.5; // Increment the x rotation by 0.5
+      unityInstance.SendMessage('Main Camera', 'SetCameraRX', xrot.toString()); // Send the updated rotation to Unity
+    } else {
+      console.error('Unity instance is not available.');
+    }
+  }
+
   var script = document.createElement("script");
   script.src = loaderUrl;
   script.onload = () => {
@@ -118,47 +148,40 @@
       alert(message);
     });
   };
+
   document.body.appendChild(script);
 
   // Listen for messages from the parent window
-  window.addEventListener('message', function(event) {
-    console.log('Received message:', event.data);
+ window.addEventListener('message', function(event) {
+  console.log('Received message:', event.data);
 
-    if (event.data.type === 'unityMessage') {
-      // Ensure the message is from a trusted source if necessary
-      switch (event.data.functionName) {
-        case 'SetText':
-          console.log('Setting text:', event.data.argument);
-          if (unityInstance) {
-            console.log('Sending message to Unity: SetText', event.data.argument);
-            unityInstance.SendMessage('TextObject', 'SetText', event.data.argument);
-          } else {
-            console.error('Unity instance is not available.');
-          }
-          break;
-        case 'SetCameraXPosition':
-          console.log('Setting camera X position:', event.data.argument);
-          if (unityInstance) {
-            console.log('Sending message to Unity: SetCameraXPosition', event.data.argument);
-            unityInstance.SendMessage('Main Camera', 'SetCameraXPosition', event.data.argument);
-          } else {
-            console.error('Unity instance is not available.');
-          }
-          break;
-        case 'SetCameraRX':
-          console.log('Setting camera X rotation:', event.data.argument);
-          if (unityInstance) {
-            console.log('Sending message to Unity: SetCameraRX', event.data.argument);
-            unityInstance.SendMessage('Main Camera', 'SetCameraRX', event.data.argument);
-          } else {
-            console.error('Unity instance is not available.');
-          }
-          break;
-        default:
-          console.warn('Unknown function name:', event.data.functionName);
-      }
+  if (event.data.type === 'unityMessage') {
+    // Ensure the message is from a trusted source if necessary
+    switch (event.data.functionName) {
+      case 'SetText':
+        console.log('Setting text:', event.data.argument);
+        if (unityInstance) {
+          unityInstance.SendMessage('TextObject', 'SetText', event.data.argument);
+        }
+        break;
+      case 'SetCameraXPosition':
+        console.log('Setting camera X position:', event.data.argument);
+        if (unityInstance) {
+          unityInstance.SendMessage('Main Camera', 'SetCameraXPosition', event.data.argument);
+        }
+        break;
+      case 'SetCameraRX':
+        console.log('Setting camera X rotation:', event.data.argument);
+        if (unityInstance) {
+          unityInstance.SendMessage('Main Camera', 'SetCameraRX', event.data.argument);
+        }
+        break;
+      default:
+        console.warn('Unknown function name:', event.data.functionName);
     }
-  });
+  }
+});
+
 </script>
 </body>
 </html>
